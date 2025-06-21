@@ -41,7 +41,7 @@ Use the following commit message prefixes to standardize your commits:
   _Example:_ `refactor: improve scraping service structure`
 
 - **conf:** message describing configuration changes  
-  _Example:_ `conf: update .env example and logging config`
+  _Example:_ `config: update .env example and logging config`
 
 - **doc:** message describing documentation changes  
   _Example:_ `doc: update README with usage instructions`
