@@ -1,8 +1,4 @@
-# PyNest service
-
-This is a template for a PyNest service.
-
-## Start Service
+# Start Service
 
 ## Step 1 - Create environment
 
@@ -11,6 +7,9 @@ This is a template for a PyNest service.
 ```bash
 pip install -r requirements.txt
 ```
+
+- Create a `.env` file in the project root.  
+  Copy all variables from `.env.example` and change the values as needed for your environment.
 
 ## Step 2 - start service local
 
@@ -40,7 +39,7 @@ Use the following commit message prefixes to standardize your commits:
 - **refactor:** message describing a code refactor  
   _Example:_ `refactor: improve scraping service structure`
 
-- **conf:** message describing configuration changes  
+- **config:** message describing configuration changes  
   _Example:_ `config: update .env example and logging config`
 
 - **doc:** message describing documentation changes  
@@ -48,3 +47,4 @@ Use the following commit message prefixes to standardize your commits:
 
 - **feat:** message describing a new feature or implementation  
   _Example:_ `feat: add endpoint for book search`
+
