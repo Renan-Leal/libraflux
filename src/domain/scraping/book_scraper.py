@@ -7,10 +7,11 @@ from urllib.parse import urljoin
 from ...infra.logs.logging_service import LoggingService
 import os
 
+
 @Injectable
 class BookScraper:
     def __init__(self, logger: LoggingService):
-        self.base_url = os.environ.get('URL_TO_SCRAPE')
+        self.base_url = os.environ.get("URL_TO_SCRAPE")
         self.session = requests.Session()
         self.books_data = []
         self.logger = logger

@@ -13,6 +13,7 @@ load_dotenv()
 class AppModule:
     pass
 
+
 api_version = os.environ.get("API_VERSION", "1.0.0")
 debug = os.environ.get("DEBUG", "False").lower() == "true"
 api_title = os.environ.get("API_TITLE", "Dataflux API")
@@ -25,7 +26,7 @@ app = PyNestFactory.create(
     description=api_description,
     title=api_title,
     version=api_version,
-    debug=debug
+    debug=debug,
 )
 
 # Configura o prefixo global se estiver definido
