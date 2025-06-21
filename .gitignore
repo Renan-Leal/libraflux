@@ -1,0 +1,29 @@
+# Python-specific
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Dependency directories
+venv/
+env/
+envs/
+.env
+
+# Compiled source
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.so
+
+# Logs and databases
+*.log
+*.sqlite
+*.db
+
+# Compiled files
+dist/
+build/
+*.egg-info/
