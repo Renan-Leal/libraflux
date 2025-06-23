@@ -4,12 +4,13 @@ from fastapi import APIRouter
 from nest.core import PyNestFactory, Module
 from .domain.book.book_module import BookModule
 from .domain.scraping.scraping_module import ScrapingModule
+from .domain.health.health_module import HealthModule
 from .infra.logs.logging_module import LoggingModule
 
 load_dotenv()
 
 
-@Module(imports=[LoggingModule, BookModule, ScrapingModule])
+@Module(imports=[LoggingModule, BookModule, ScrapingModule, HealthModule])
 class AppModule:
     pass
 
