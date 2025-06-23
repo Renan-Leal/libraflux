@@ -29,6 +29,23 @@ uvicorn "app:app" --host "0.0.0.0" --port "8000" --reload
 
 Go to the fastapi docs and use your api endpoints - http://127.0.0.1/docs
 
+
+## Project Structure and Contribution Guidelines
+
+## Code linting and formatting
+
+To ensure code quality and consistency, run the following script from the project root:
+
+```bash
+./lint.sh
+```
+
+This script will:
+- Format your code using **Black**
+- Run **pylint** to check for code issues
+
+Make sure to run this script before committing your changes.
+
 ## Commit message convention
 
 Use the following commit message prefixes to standardize your commits:
