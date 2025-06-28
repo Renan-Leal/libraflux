@@ -6,6 +6,9 @@ from .domain.book.book_module import BookModule
 from .domain.scraping.scraping_module import ScrapingModule
 from .domain.health.health_module import HealthModule
 from .infra.logs.logging_module import LoggingModule
+from .infra.models import *
+from .infra.db import Base, engine
+
 
 load_dotenv()
 
@@ -21,6 +24,7 @@ api_title = os.environ.get("API_TITLE", "Libraflux API")
 api_description = os.environ.get("API_DESCRIPTION", "Libraflux Scraping data flow")
 api_prefix = os.environ.get("API_VERSION_PREFIX", "")
 
+
 # Cria a aplicação PyNest
 app = PyNestFactory.create(
     AppModule,
@@ -29,6 +33,9 @@ app = PyNestFactory.create(
     version=api_version,
     debug=debug,
 )
+
+# Cria as tabelas se ainda não existirem
+Base.metadata.create_all(bind=engine)
 
 # Configura o prefixo global se estiver definido
 if api_prefix:
