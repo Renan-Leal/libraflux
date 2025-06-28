@@ -17,8 +17,8 @@ class AppModule:
 
 api_version = os.environ.get("API_VERSION", "1.0.0")
 debug = os.environ.get("DEBUG", "False").lower() == "true"
-api_title = os.environ.get("API_TITLE", "Dataflux API")
-api_description = os.environ.get("API_DESCRIPTION", "Dataflux Scraping data flow")
+api_title = os.environ.get("API_TITLE", "Libraflux API")
+api_description = os.environ.get("API_DESCRIPTION", "Libraflux Scraping data flow")
 api_prefix = os.environ.get("API_VERSION_PREFIX", "")
 
 # Cria a aplicação PyNest
