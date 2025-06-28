@@ -28,7 +28,7 @@ class BookScraper:
 
     def __get_categories(self) -> Dict[str, str]:
         """Extrai todas as categorias de livros"""
-        soup = self.get_page(self.base_url)
+        soup = self.__get_page(self.base_url)
         if not soup:
             return {}
         
@@ -53,7 +53,7 @@ class BookScraper:
         book_data = {}
 
         book_url_aux = f'{self.base_url}/catalogue/{book_url.split('../')[-1]}'
-        soup_page_book = self.get_page(book_url_aux)
+        soup_page_book = self.__get_page(book_url_aux)
 
         # Título do livro
         book_data['title'] = soup_page_book.find("h1").get_text(strip=True) if soup_page_book.find("h1") else ""
@@ -113,15 +113,15 @@ class BookScraper:
     def __extract_book_info(self, book_element) -> Dict:
         """Chama o método para extrair a informação do livro, passando a url dele"""
         book_url = book_element.find('h3').find('a').get('href')
-        book_details = self.extract_book_details(book_url)
+        book_details = self.__extract_book_details(book_url)
         
         # Resultado filtrado com limpeza de "Â"
         books_filtered = {
             'id': book_details.get('UPC'),
             'title': book_details.get('title'),
-            'price_excl_tax': book_details.get('Price (excl. tax)', '').replace("Â", ""),
-            'price_incl_tax': book_details.get('Price (incl. tax)', '').replace("Â", ""),
-            'tax': book_details.get('Tax', '').replace("Â", ""),
+            'price_excl_tax': book_details.get('Price (excl. tax)', '').replace("Â£", ""),
+            'price_incl_tax': book_details.get('Price (incl. tax)', '').replace("Â£", ""),
+            'tax': book_details.get('Tax', '').replace("Â£", ""),
             'availability': book_details.get('Availability'),
             'reviews_qtd': book_details.get('Number of reviews'),
             'description': book_details.get('description'),
@@ -132,7 +132,7 @@ class BookScraper:
 
     def __get_books_from_page(self, page_url: str) -> List[Dict]:
         """Extrai todos os livros de uma página"""
-        soup = self.get_page(page_url)
+        soup = self.__get_page(page_url)
         if not soup:
             return []
         
@@ -140,7 +140,7 @@ class BookScraper:
         book_elements = soup.find_all('article', class_='product_pod')
         
         for book_element in book_elements:
-            book_info = self.extract_book_info(book_element)
+            book_info = self.__extract_book_info(book_element)
             if book_info['title']:  # Só adiciona se tiver título
                 books.append(book_info)
         
@@ -155,11 +155,11 @@ class BookScraper:
         while current_url:
             self.logger.info(f"Processando página {page_num} - {current_url}")
             
-            books = self.get_books_from_page(current_url)
+            books = self.__get_books_from_page(current_url)
             all_books.extend(books)
             
             # Verifica se há próxima página
-            soup = self.get_page(current_url)
+            soup = self.__get_page(current_url)
             if soup:
                 next_link = soup.find('li', class_='next')
                 self.logger.debug(f"pagina {page_num} : {next_link}")
@@ -180,7 +180,7 @@ class BookScraper:
         """Faz scraping de uma categoria específica"""
         self.logger.info(f"Iniciando scraping da categoria: {category_name}")
         
-        books = self.get_all_pages_from_category(category_url)
+        books = self.__get_all_pages_from_category(category_url)
         
         for book in books:
             book['category'] = category_name
@@ -192,10 +192,6 @@ class BookScraper:
         """Função principal para executar o scraping"""
 
         categories = self.__get_categories()
-
-        # print("Categorias disponíveis:")
-        # for i, (name, url) in enumerate(categories.items(), 1):
-        #     print(f"{i}. {name}")
 
         if categories:
             first_category = list(categories.items())[0]
