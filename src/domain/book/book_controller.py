@@ -12,7 +12,6 @@ class BookController:
     # CORE
     @Get("/")
     def list_books(self):
-        print("test")
         return self.service.list_books()
 
     @Get("/<id>")
@@ -28,3 +27,4 @@ class BookController:
     @Get("/categories")
     def list_categories(self):
         return self.service.list_categories()
+    
