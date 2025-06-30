@@ -168,7 +168,7 @@ class BookScraper:
             "description": book_details.get("description"),
             "image": book_details.get("image"),
         }
-
+        
         return books_filtered
 
     def __get_books_from_page(self, page_url: str) -> List[Dict]:
@@ -223,10 +223,7 @@ class BookScraper:
 
         books = self.__get_all_pages_from_category(category_url)
 
-        for book in books:
-            book["category"] = category_name
-
-        self.logger.info(f"Categoria {category_name}: {len(books)} livros encontrados")
+        self.logger.info(f"Quantidade de livros encontrados - {len(books)}")
         return books
 
     def execute(self):
