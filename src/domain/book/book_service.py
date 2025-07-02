@@ -9,9 +9,16 @@ class BookService:
 
     def list_books(self):
         """List all books in the database."""
-        #TODO
-        # descobrir como realizar a paginação
         return self.repository.list_all()
+
+    def list_books_paginated(self, page: int, size: int):
+        """
+        Retorna uma lista paginada de livros.
+        """
+        start = (page - 1) * size
+        end = start + size
+        books = self.list_books()  # Método que retorna todos os livros
+        return books[start:end]
 
     def get_book_by_id(self, id: int):
         pass

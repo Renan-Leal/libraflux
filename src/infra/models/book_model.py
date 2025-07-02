@@ -9,6 +9,7 @@ class BookModel(Base):
     uuid = Column(String(36), unique=True, nullable=False)
     title = Column(String(200), nullable=False)
     category = Column(String(36), nullable=False)
+    rating = Column(Integer, nullable=True)
     price_excl_tax = Column(Float, nullable=False)
     price_incl_tax = Column(Float, nullable=False)
     tax = Column(Float, nullable=False)
