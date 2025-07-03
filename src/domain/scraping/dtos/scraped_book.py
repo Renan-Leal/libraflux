@@ -7,6 +7,7 @@ class ScrapedBook:
         uuid: str,
         title: str,
         category: str,
+        rating: int,
         price_excl_tax: float,
         price_incl_tax: float,
         tax: float,
@@ -18,6 +19,7 @@ class ScrapedBook:
         self.uuid = uuid
         self.title = title
         self.category = category
+        self.rating = rating
         self.price_excl_tax = price_excl_tax
         self.price_incl_tax = price_incl_tax
         self.tax = tax
@@ -31,6 +33,7 @@ class ScrapedBook:
             uuid=self.uuid,
             title=self.title,
             category=self.category,
+            rating=self.rating,
             price_excl_tax=self.price_excl_tax,
             price_incl_tax=self.price_incl_tax,
             tax=self.tax,

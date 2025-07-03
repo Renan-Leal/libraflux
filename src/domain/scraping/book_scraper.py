@@ -156,6 +156,7 @@ class BookScraper:
             "id": book_details.get("UPC"),
             "title": book_details.get("title"),
             "category": book_details.get("category", ""),
+            "rating": book_details.get("rating", 0),
             "price_excl_tax": book_details.get("Price (excl. tax)", "").replace(
                 "Â£", ""
             ),
@@ -166,7 +167,7 @@ class BookScraper:
             "availability": book_details.get("quantity", 0),
             "reviews_qtd": book_details.get("Number of reviews"),
             "description": book_details.get("description"),
-            "image": book_details.get("image"),
+            "image": book_details.get("image")
         }
         
         return books_filtered
@@ -193,7 +194,8 @@ class BookScraper:
         current_url = category_url
         page_num = 1
 
-        while current_url:
+        count = 0
+        while current_url and count < 1:
             self.logger.info(f"Processando página {page_num} - {current_url}")
 
             books = self.__get_books_from_page(current_url)
@@ -212,7 +214,8 @@ class BookScraper:
                     current_url = None
             else:
                 break
-
+            
+            count += 1
             time.sleep(0.5)
 
         return all_books
