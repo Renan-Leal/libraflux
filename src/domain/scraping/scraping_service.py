@@ -25,7 +25,7 @@ class ScrapingService:
                 availability=book_data.get("availability"),
                 reviews_qtd=book_data.get("reviews_qtd", 0),
                 description=book_data.get("description"),
-                image=book_data.get("image")
+                image=book_data.get("image"),
             )
             book_model = scraped_book.to_book_model()
             book_model_list.append(book_model)

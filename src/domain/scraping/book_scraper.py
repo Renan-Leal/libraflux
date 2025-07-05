@@ -167,9 +167,9 @@ class BookScraper:
             "availability": book_details.get("quantity", 0),
             "reviews_qtd": book_details.get("Number of reviews"),
             "description": book_details.get("description"),
-            "image": book_details.get("image")
+            "image": book_details.get("image"),
         }
-        
+
         return books_filtered
 
     def __get_books_from_page(self, page_url: str) -> List[Dict]:
@@ -214,7 +214,7 @@ class BookScraper:
                     current_url = None
             else:
                 break
-            
+
             count += 1
             time.sleep(0.5)
 
