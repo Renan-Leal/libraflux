@@ -30,10 +30,9 @@ class BookController:
         return self.service.get_book_by_id(id)
 
     @Get("/search")
-    def search_books(self, search_book_dto: SearchBookDTO):
-        return self.service.search_books(
-            search_book_dto.title, search_book_dto.category
-        )
+    def search_books(self, title: str = None, category: str = None):
+        #Eu retirei o DTO pois alteraria pra POST; e na documentação pede GET;
+        return self.service.search_books(title,category)
 
     @Get("/categories")
     def list_categories(self):
