@@ -31,8 +31,7 @@ class BookController:
 
     @Get("/search")
     def search_books(self, title: str = None, category: str = None):
-        #Eu retirei o DTO pois alteraria pra POST; e na documentação pede GET;
-        return self.service.search_books(title,category)
+        return self.service.search_books(title, category)
 
     @Get("/categories")
     def list_categories(self):
