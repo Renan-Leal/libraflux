@@ -1,4 +1,5 @@
 from nest.core import Injectable
+from sqlalchemy import and_
 from ..models.book_model import BookModel
 from ..db import SessionLocal
 
@@ -20,3 +21,24 @@ class BookRepository:
     def list_all(self) -> list[BookModel]:
         with SessionLocal() as session:
             return session.query(BookModel).all()
+        
+    def list_bycategory(self, category: str) -> list[BookModel]:
+        with SessionLocal() as session:
+            return session.query(BookModel).filter(
+                BookModel.category==category
+            ).all()
+    
+    def list_bytitle(self, title: str) -> list[BookModel]:
+        with SessionLocal() as session:
+            return session.query(BookModel).filter(
+                BookModel.title==title
+            ).all()
+    
+    def list_bycategoryandtitle(self, title: str, category: str) -> list[BookModel]:
+        with SessionLocal() as session:
+            return session.query(BookModel).filter(
+                and_(
+                    BookModel.category==category,
+                    BookModel.title==title
+                )
+            ).all()

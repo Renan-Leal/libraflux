@@ -24,6 +24,14 @@ class BookService:
         pass
 
     def search_books(self, title: str = None, category: str = None):
+        if (title and title.strip()) and (category and category.strip()):
+            return self.repository.list_bycategoryandtitle(title,category) 
+        elif title and title.strip():
+            return self.repository.list_bytitle(title)
+        elif category and category.strip():
+            return self.repository.list_bycategory(category)
+        else:
+            return []
         pass
 
     def list_categories(self):
