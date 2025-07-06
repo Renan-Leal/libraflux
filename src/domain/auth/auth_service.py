@@ -5,6 +5,7 @@ from .dtos.auth_signup import AuthSignup
 from ..user.user import User
 from ...infra.repositories.user.user_repository import UserRepository
 
+
 @Injectable
 class AuthService:
     def __init__(self, userRepository: UserRepository):
@@ -12,12 +13,14 @@ class AuthService:
 
     def signup(self, authSignup: AuthSignup):
         secret = os.environ.get("JWT_SECRET_KEY", "")
-        password_hash = hashlib.sha256((authSignup.password + secret).encode()).hexdigest()
+        password_hash = hashlib.sha256(
+            (authSignup.password + secret).encode()
+        ).hexdigest()
         user = User(
             authSignup.email,
             authSignup.name,
             password_hash,
-            authSignup.role if hasattr(authSignup, "role") else None
+            authSignup.role if hasattr(authSignup, "role") else None,
         )
         user_model = user.to_user_model()
         try:
@@ -26,8 +29,12 @@ class AuthService:
                 return {
                     "email": created_user.email,
                     "name": created_user.name,
-                    "role": created_user.role.value if hasattr(created_user.role, "value") else str(created_user.role),
-                    "message": "User created successfully"
+                    "role": (
+                        created_user.role.value
+                        if hasattr(created_user.role, "value")
+                        else str(created_user.role)
+                    ),
+                    "message": "User created successfully",
                 }, 201
             else:
                 return {"message": "Failed to create user"}, 400

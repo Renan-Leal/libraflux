@@ -1,13 +1,14 @@
 from ...infra.models.user_model import UserModel
 from ...common.enums import UserRole
 
+
 class User:
     def __init__(
         self,
         email: str,
         name: str,
         password: str,
-        role = 'REGULAR',
+        role="REGULAR",
     ):
         self.email = email
         self.name = name
@@ -19,5 +20,5 @@ class User:
             email=self.email,
             name=self.name,
             password=self.password,
-            role=UserRole(self.role)
+            role=UserRole(self.role),
         )

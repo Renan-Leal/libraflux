@@ -22,7 +22,7 @@ load_dotenv()
         ScrapingModule,
         HealthModule,
         CategoriesModule,
-        AuthModule
+        AuthModule,
     ]
 )
 class AppModule:

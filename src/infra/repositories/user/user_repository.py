@@ -2,6 +2,7 @@ from nest.core import Injectable
 from ...models.user_model import UserModel
 from ...db import SessionLocal
 
+
 @Injectable
 class UserRepository:
     def __init__(self):
