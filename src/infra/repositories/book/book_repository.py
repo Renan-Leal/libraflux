@@ -1,7 +1,7 @@
 from nest.core import Injectable
 from sqlalchemy import and_
-from ..models.book_model import BookModel
-from ..db import SessionLocal
+from ...models.book_model import BookModel
+from ...db import SessionLocal
 
 
 @Injectable
