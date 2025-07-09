@@ -21,7 +21,7 @@ class BookRepository:
     def list_all(self) -> list[BookModel]:
         with SessionLocal() as session:
             return session.query(BookModel).all()
-        
+
     def get_by_id(self, book_int: int) -> BookModel:
         with SessionLocal() as session:
             return session.query(BookModel).filter_by(id=book_int).first()

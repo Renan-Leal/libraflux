@@ -2,6 +2,7 @@ from collections import defaultdict
 from nest.core import Injectable
 from ...infra.repositories.book_repository import BookRepository
 
+
 @Injectable
 class StatsService:
     def __init__(self, repository: BookRepository):
@@ -24,12 +25,14 @@ class StatsService:
                 "rating_distribution": {},
             }
 
-        total_price = sum(float(book.price_incl_tax) for book in books if book.price_incl_tax)
+        total_price = sum(
+            float(book.price_incl_tax) for book in books if book.price_incl_tax
+        )
         average_price = total_price / total_books if total_books > 0 else 0
 
         rating_distribution = defaultdict(int)
         for book in books:
-            if hasattr(book, 'rating') and book.rating and 0 < book.rating <= 5:
+            if hasattr(book, "rating") and book.rating and 0 < book.rating <= 5:
                 rating_distribution[book.rating] += 1
 
         return {
@@ -47,7 +50,7 @@ class StatsService:
         dict: "book_count": int, "average_price": float
         """
         books = self.repository.list_all()
-        
+
         category_stats = defaultdict(lambda: {"book_count": 0, "total_price": 0.0})
 
         for book in books:

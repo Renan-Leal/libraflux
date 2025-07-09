@@ -1,6 +1,7 @@
 from nest.core import Controller, Get
 from .stats_service import StatsService
 
+
 @Controller("/stats")
 class StatsController:
     def __init__(self, service: StatsService):
