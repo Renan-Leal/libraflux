@@ -25,7 +25,7 @@ class BookController:
             return self.service.list_books_paginated(page, size)
         return self.service.list_books()
 
-    @Get("/<id>")
+    @Get("/{id}")
     def get_book(self, id: int):
         return self.service.get_book_by_id(id)
 
