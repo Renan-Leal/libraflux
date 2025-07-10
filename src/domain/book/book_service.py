@@ -21,7 +21,7 @@ class BookService:
         return books[start:end]
 
     def get_book_by_id(self, id: int):
-        pass
+        return self.repository.get_by_id(id)
 
     def search_books(self, title: str = None, category: str = None):
         if (title and title.strip()) and (category and category.strip()):
