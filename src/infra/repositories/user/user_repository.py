@@ -14,3 +14,7 @@ class UserRepository:
             session.commit()
             session.refresh(user)
         return user
+
+    def find_by_email(self, email: str):
+        with SessionLocal() as session:
+            return session.query(UserModel).filter_by(email=email).first()
