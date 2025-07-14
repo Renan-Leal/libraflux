@@ -1,6 +1,6 @@
 from collections import defaultdict
 from nest.core import Injectable
-from ...infra.repositories.book_repository import BookRepository
+from ...infra.repositories.book.book_repository import BookRepository
 
 
 @Injectable

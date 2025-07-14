@@ -1,5 +1,5 @@
 from nest.core import Injectable
-from ...infra.repositories.book_repository import BookRepository
+from ...infra.repositories.book.book_repository import BookRepository
 
 
 @Injectable
@@ -27,11 +27,11 @@ class BookService:
         """
         return self.repository.get_by_id(id)
 
-    def search_books(self, title: str = None, category: str = None):       
+    def search_books(self, title: str = None, category: str = None):
         """
         Busca livros por título e/ou categoria.
         Exemplo: /books/search?title={Title}&category={Category}
-        """ 
+        """
         if (title and title.strip()) and (category and category.strip()):
             return self.repository.list_bycategoryandtitle(title, category)
         elif title and title.strip():

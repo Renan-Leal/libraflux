@@ -1,7 +1,7 @@
 from nest.core import Injectable
 from .book_scraper import BookScraper
 from .dtos.scraped_book import ScrapedBook
-from ...infra.repositories.book_repository import BookRepository
+from ...infra.repositories.book.book_repository import BookRepository
 
 
 @Injectable

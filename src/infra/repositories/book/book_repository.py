@@ -1,7 +1,7 @@
 from nest.core import Injectable
 from sqlalchemy import and_
-from ..models.book_model import BookModel
-from ..db import SessionLocal
+from ...models.book_model import BookModel
+from ...db import SessionLocal
 
 
 @Injectable
@@ -75,8 +75,10 @@ class BookRepository:
                 .order_by(BookModel.rating.desc())
                 .all()
             )
-    
-    def list_by_price_range(self, min_price: float, max_price: float) -> list[BookModel]:
+
+    def list_by_price_range(
+        self, min_price: float, max_price: float
+    ) -> list[BookModel]:
         """
         Lista livros dentro de um intervalo de preços.
         Exemplo: /books/price-range?min_price=10.0&max_price=50.0
@@ -84,8 +86,10 @@ class BookRepository:
         with SessionLocal() as session:
             return (
                 session.query(BookModel)
-                .filter(BookModel.price_incl_tax >= min_price, BookModel.price_incl_tax <= max_price)
-                .order_by(BookModel.price_incl_tax)                
+                .filter(
+                    BookModel.price_incl_tax >= min_price,
+                    BookModel.price_incl_tax <= max_price,
+                )
+                .order_by(BookModel.price_incl_tax)
                 .all()
             )
-        
