@@ -9,6 +9,9 @@ class UserRepository:
         pass
 
     def save(self, user: UserModel):
+        """
+        Salva um usuário no banco de dados.
+        """
         with SessionLocal() as session:
             session.add(user)
             session.commit()
@@ -16,5 +19,8 @@ class UserRepository:
         return user
 
     def find_by_email(self, email: str):
+        """
+        Busca um usuário pelo email.
+        """
         with SessionLocal() as session:
             return session.query(UserModel).filter_by(email=email).first()
