@@ -11,6 +11,10 @@ class HealthService:
         self.base_url = os.environ.get("URL_TO_SCRAPE")
 
     def check(self):
+        """
+        Verifica a saúde do sistema, incluindo a disponibilidade da URL configurada.
+        Retorna um dicionário com o status da verificação.
+        """
         try:
             response = requests.get(self.base_url, timeout=5)
             if response.status_code == 200:

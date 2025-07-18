@@ -11,6 +11,9 @@ class ScrapingService:
         self.repository = repository
 
     async def trigger(self):
+        """
+        Executa o scraping dos livros e salva no banco de dados.
+        """
         book_list = self.book_scraper.execute()
         book_model_list = []
         for book_data in book_list:
