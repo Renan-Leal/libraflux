@@ -24,9 +24,17 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Set tag for pull request
+        if: github.event_name == 'pull_request'
+        run: echo "TAG=ghcr.io/${{ toLower(github.repository_owner) }}/libraflux:pr-${{ github.event.pull_request.number }}" >> $GITHUB_ENV
+
+      - name: Set tag for push to main
+        if: github.event_name == 'push'
+        run: echo "TAG=ghcr.io/${{ toLower(github.repository_owner) }}/libraflux:latest" >> $GITHUB_ENV
+
       - name: Build and Push Docker image to GHCR
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
-          tags: ${{ github.event_name == 'pull_request' && format('ghcr.io/{0}/libraflux:pr-{1}', github.repository_owner.toLowerCase(), github.event.pull_request.number) || format('ghcr.io/{0}/libraflux:latest', github.repository_owner.toLowerCase()) }}
+          tags: ${{ env.TAG }}
