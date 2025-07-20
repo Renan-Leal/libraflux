@@ -1,5 +1,5 @@
 from nest.core import Injectable
-from ...infra.repositories.book_repository import BookRepository
+from ...infra.repositories.book.book_repository import BookRepository
 
 
 @Injectable
@@ -21,9 +21,17 @@ class BookService:
         return books[start:end]
 
     def get_book_by_id(self, id: int):
+        """
+        Retorna um livro pelo ID.
+        Exemplo: /books/1
+        """
         return self.repository.get_by_id(id)
 
     def search_books(self, title: str = None, category: str = None):
+        """
+        Busca livros por título e/ou categoria.
+        Exemplo: /books/search?title={Title}&category={Category}
+        """
         if (title and title.strip()) and (category and category.strip()):
             return self.repository.list_bycategoryandtitle(title, category)
         elif title and title.strip():
@@ -32,7 +40,16 @@ class BookService:
             return self.repository.list_bycategory(category)
         else:
             return []
-        pass
 
-    def list_categories(self):
-        pass
+    def get_top_rated_books(self):
+        """
+        Retorna uma lista de livros bem avaliados (exemplo: rating >= 4).
+        """
+        return self.repository.get_top_rated_books()
+
+    def list_books_by_price_range(self, min_price: float, max_price: float):
+        """
+        Lista livros dentro de um intervalo de preços.
+        Exemplo: /books/price-range?min_price=10.0&max_price=50.0
+        """
+        return self.repository.list_by_price_range(min_price, max_price)

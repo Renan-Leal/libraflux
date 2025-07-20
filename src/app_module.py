@@ -10,6 +10,7 @@ from .domain.stats.stats_module import StatsModule
 from .infra.logs.logging_module import LoggingModule
 from .infra.models import *
 from .infra.db import Base, engine
+from .domain.auth.auth_module import AuthModule
 
 
 load_dotenv()
@@ -23,6 +24,7 @@ load_dotenv()
         HealthModule,
         CategoriesModule,
         StatsModule,
+        AuthModule,
     ]
 )
 class AppModule:
