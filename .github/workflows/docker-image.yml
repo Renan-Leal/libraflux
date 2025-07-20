@@ -29,4 +29,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ github.event_name == 'pull_request' && format('ghcr.io/{0}/libraflux:pr-{1}', github.repository_owner, github.event.pull_request.number) || format('ghcr.io/{0}/libraflux:latest', github.repository_owner) }}
+          tags: ${{ github.event_name == 'pull_request' && format('ghcr.io/{0}/libraflux:pr-{1}', github.repository_owner.toLowerCase(), github.event.pull_request.number) || format('ghcr.io/{0}/libraflux:latest', github.repository_owner.toLowerCase()) }}
