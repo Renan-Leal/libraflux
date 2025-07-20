@@ -11,5 +11,8 @@ class CategoriesService:
         self.session = SessionLocal
 
     def get_all_categories(self) -> List[CategoryListResponse]:
+        """
+        Retorna todas as categorias disponíveis.        
+        """
         rows = self.session.query(BookModel.category).distinct().all()
         return [CategoryListResponse(category=row.category) for row in rows]

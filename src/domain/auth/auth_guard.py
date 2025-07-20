@@ -8,6 +8,11 @@ security = HTTPBearer()
 
 
 def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    """
+    Verifica o token JWT e retorna o usuário atual.
+    Esta função decodifica o token JWT e verifica sua validade, retornando os dados do usuário.
+    Se o token for inválido ou expirado, uma exceção HTTP 401 é levantada.
+    """
     token = credentials.credentials
     secret = os.environ.get("JWT_SECRET_KEY", "")
     jwt_algorithm = os.environ.get("JWT_ALGORITHM", "")
