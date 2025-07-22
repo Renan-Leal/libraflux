@@ -47,7 +47,7 @@ jobs:
       - name: Update dev/docker-compose.yml
         run: |
           cd libraflux-config
-          sed -i -E "s|(image: renanleal/libraflux:).*|\1${TAG#*/}|" dev/docker-compose.yml
+          sed -i -E "s|(image: renanleal/libraflux:).*|\1${TAG##*:}|" dev/docker-compose.yml
 
       - name: Commit and Push Changes
         run: |
