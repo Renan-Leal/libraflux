@@ -25,6 +25,7 @@ jobs:
 
       - name: Set tag for pull request
         id: set-tag
+        if: github.event_name == 'pull_request'
         run: |
           TAG="renanleal/libraflux:pr-${{ github.event.pull_request.number }}"
           echo "image_tag=$TAG" >> $GITHUB_OUTPUT
@@ -48,14 +49,19 @@ jobs:
           path: libraflux-config
           token: ${{ secrets.PAT_TOKEN }}
 
-      - name: Debug - Show image_tag
+      - name: Validate and Set Tag
+        id: validate-tag
         run: |
-          echo "Tag recebida: ${{ needs.build-and-push.outputs.image_tag }}"
+          if [ -z "${{ needs.build-and-push.outputs.image_tag }}" ]; then
+            echo "::error::Tag is empty!"
+            exit 1
+          fi
+          echo "TAG=${{ needs.build-and-push.outputs.image_tag }}" >> $GITHUB_ENV
 
       - name: Update dev/docker-compose.yml
         run: |
           cd libraflux-config
-          sed -i "s|image: renanleal/libraflux:.*|image: ${{ needs.build-and-push.outputs.image_tag }}|" dev/docker-compose.yml
+          sed -i "s|image: renanleal/libraflux:.*|image: ${{ env.TAG }}|" dev/docker-compose.yml
 
       - name: Commit and Push Changes
         run: |
@@ -63,5 +69,5 @@ jobs:
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
           git add dev/docker-compose.yml
-          git commit -m "Update Docker image to ${{ needs.build-and-push.outputs.image_tag }}"
+          git commit -m "Update Docker image to ${{ env.TAG }}"
           git push origin main
