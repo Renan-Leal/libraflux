@@ -5,11 +5,8 @@ on:
     branches: ["main"]
 
 jobs:
-  build-and-push:
+  build-and-update:
     runs-on: ubuntu-latest
-    outputs:
-      image_tag: ${{ steps.set-tag.outputs.image_tag }}
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -23,13 +20,12 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Set tag for pull request
+      - name: Set PR tag
         id: set-tag
         run: |
-          # Usar sempre o mesmo método para definir outputs
           TAG="renanleal/libraflux:pr-${{ github.event.pull_request.number }}"
-          echo "image_tag=$TAG" >> $GITHUB_OUTPUT
           echo "TAG=$TAG" >> $GITHUB_ENV
+          echo "::set-output name=image_tag::$TAG"
 
       - name: Build and Push Docker image
         uses: docker/build-push-action@v5
@@ -38,10 +34,6 @@ jobs:
           push: true
           tags: ${{ env.TAG }}
 
-  update-compose:
-    needs: build-and-push
-    runs-on: ubuntu-latest
-    steps:
       - name: Checkout libraflux-config
         uses: actions/checkout@v4
         with:
@@ -49,17 +41,9 @@ jobs:
           path: libraflux-config
           token: ${{ secrets.PAT_TOKEN }}
 
-      - name: Get image tag from previous job
-        id: set-tag
-        run: |
-          # Recebe o valor corretamente formatado
-          echo "image_tag=${{ needs.build-and-push.outputs.image_tag }}" >> $GITHUB_OUTPUT
-          echo "TAG=${{ needs.build-and-push.outputs.image_tag }}" >> $GITHUB_ENV
-
       - name: Update dev/docker-compose.yml
         run: |
           cd libraflux-config
-          # Usa variável de ambiente para segurança
           sed -i "s|image: renanleal/libraflux:.*|image: ${TAG}|" dev/docker-compose.yml
 
       - name: Commit and Push Changes
