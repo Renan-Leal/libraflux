@@ -37,23 +37,23 @@ jobs:
       - name: DEBUGZADA
         run: |
           echo ${TAG}
-      # - name: Checkout libraflux-config
-      #   uses: actions/checkout@v4
-      #   with:
-      #     repository: Renan-Leal/libraflux-config
-      #     path: libraflux-config
-      #     token: ${{ secrets.PAT_TOKEN }}
+      - name: Checkout libraflux-config
+        uses: actions/checkout@v4
+        with:
+          repository: Renan-Leal/libraflux-config
+          path: libraflux-config
+          token: ${{ secrets.PAT_TOKEN }}
 
-      # - name: Update dev/docker-compose.yml
-      #   run: |
-      #     cd libraflux-config
-      #     sed -i "s|image: renanleal/libraflux:.*|image: ${TAG}|" dev/docker-compose.yml
+      - name: Update dev/docker-compose.yml
+        run: |
+          cd libraflux-config
+          sed -i -E "s|(image: renanleal/libraflux:).*|\1${TAG#*/}|" dev/docker-compose.yml
 
-      # - name: Commit and Push Changes
-      #   run: |
-      #     cd libraflux-config
-      #     git config user.name "GitHub Actions"
-      #     git config user.email "actions@github.com"
-      #     git add dev/docker-compose.yml
-      #     git commit -m "Update Docker image to ${TAG}"
-      #     git push origin main
+      - name: Commit and Push Changes
+        run: |
+          cd libraflux-config
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add dev/docker-compose.yml
+          git commit -m "Update Docker image to ${TAG}"
+          git push origin main
