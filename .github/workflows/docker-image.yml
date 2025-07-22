@@ -53,7 +53,7 @@ jobs:
           cd libraflux-config
           # Usa a tag do job anterior (${{ needs.build-and-push.outputs.image_tag }})
           echo TESTE TESTE TESTE ${{needs.build-and-push.outputs.image_tag}}
-          sed -i "s|^image:.*$|image: ${{ needs.build-and-push.outputs.image_tag }}|" dev/docker-compose.yml
+          sed -i "s|^image:.*|image: ${{ needs.build-and-push.outputs.image_tag }}|" dev/docker-compose.yml
 
       - name: Commit and Push Changes
         run: |
