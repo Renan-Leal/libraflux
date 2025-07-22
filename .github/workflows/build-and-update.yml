@@ -1,4 +1,4 @@
-name: Build Docker Image and Update Compose
+name: Build, Push Docker Image and Update Docker Compose Tag
 
 on:
   pull_request:
