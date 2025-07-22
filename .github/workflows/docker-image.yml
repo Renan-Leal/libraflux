@@ -1,14 +1,16 @@
-name: Build Docker Image on PR and push to Docker Hub
+name: Build Docker Image and Update Compose
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
-  build:
+  build-and-push:
     runs-on: ubuntu-latest
+    outputs:
+      image_tag: ${{ steps.set-tag.outputs.image_tag }}  # 👈 Tag que será usada no compose
 
     steps:
       - name: Checkout code
@@ -26,16 +28,46 @@ jobs:
       - name: Set tag for pull request
         if: github.event_name == 'pull_request'
         run: |
-          echo "TAG=${{ secrets.DOCKER_USERNAME }}/libraflux:pr-${{ github.event.pull_request.number }}" >> $GITHUB_ENV
+          TAG="${{ secrets.DOCKER_USERNAME }}/libraflux:pr-${{ github.event.pull_request.number }}"
+          echo "image_tag=$TAG" >> $GITHUB_OUTPUT
+          echo "TAG=$TAG" >> $GITHUB_ENV
 
       - name: Set tag for push to main
         if: github.event_name == 'push'
         run: |
-          echo "TAG=${{ secrets.DOCKER_USERNAME }}/libraflux:latest" >> $GITHUB_ENV
+          TAG="${{ secrets.DOCKER_USERNAME }}/libraflux:latest"
+          echo "image_tag=$TAG" >> $GITHUB_OUTPUT
+          echo "TAG=$TAG" >> $GITHUB_ENV
 
-      - name: Build and Push Docker image to Docker Hub
+      - name: Build and Push Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
           tags: ${{ env.TAG }}
+
+  update-compose:
+    needs: build-and-push  # Executa apenas após o build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout libraflux-config
+        uses: actions/checkout@v4
+        with:
+          repository: Renan-Leal/libraflux-config
+          path: libraflux-config
+          token: ${{ secrets.PAT_TOKEN }}
+
+      - name: Update dev/docker-compose.yml
+        run: |
+          cd libraflux-config
+          # Usa a tag do job anterior (${{ needs.build-and-push.outputs.image_tag }})
+          sed -i "s|image: .*/libraflux:.*|image: ${{ needs.build-and-push.outputs.image_tag }}|" dev/docker-compose.yml
+
+      - name: Commit and Push Changes
+        run: |
+          cd libraflux-config
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add dev/docker-compose.yml
+          git commit -m "Update Docker image to ${{ needs.build-and-push.outputs.image_tag }}"
+          git push origin main
