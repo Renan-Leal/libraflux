@@ -8,7 +8,7 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
     outputs:
-      image_tag: ${{ steps.set-tag.outputs.image_tag }}  # Tag que será usada no compose
+      image_tag: ${{ steps.set-tag.outputs.image_tag }}
 
     steps:
       - name: Checkout code
@@ -27,7 +27,7 @@ jobs:
         id: set-tag
         if: github.event_name == 'pull_request'
         run: |
-          TAG="${{ secrets.DOCKER_USERNAME }}/libraflux:pr-${{ github.event.pull_request.number }}"
+          TAG="renanleal/libraflux:pr-${{ github.event.pull_request.number }}"
           echo "image_tag=$TAG" >> $GITHUB_OUTPUT
           echo "TAG=$TAG" >> $GITHUB_ENV
 
@@ -39,7 +39,7 @@ jobs:
           tags: ${{ env.TAG }}
 
   update-compose:
-    needs: build-and-push  # Executa apenas após o build
+    needs: build-and-push
     runs-on: ubuntu-latest
     steps:
       - name: Checkout libraflux-config
@@ -49,11 +49,14 @@ jobs:
           path: libraflux-config
           token: ${{ secrets.PAT_TOKEN }}
 
+      - name: Debug - Show image_tag
+        run: |
+          echo "Tag recebida: ${{ needs.build-and-push.outputs.image_tag }}"
+
       - name: Update dev/docker-compose.yml
         run: |
           cd libraflux-config
-          # Substitui apenas a tag, mantendo o prefixo do repositório
-          sed -i "s|\(image: renanleal/libraflux:\).*|\1${{ needs.build-and-push.outputs.image_tag }}|" dev/docker-compose.yml
+          sed -i "s|image: renanleal/libraflux:.*|image: ${{ needs.build-and-push.outputs.image_tag }}|" dev/docker-compose.yml
 
       - name: Commit and Push Changes
         run: |
