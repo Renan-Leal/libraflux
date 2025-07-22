@@ -3,11 +3,12 @@ name: Build Docker Image and Update Compose
 on:
   pull_request:
     branches: ["main"]
+
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
     outputs:
-      image_tag: ${{ steps.set-tag.outputs.image_tag }}  # 👈 Tag que será usada no compose
+      image_tag: ${{ steps.set-tag.outputs.image_tag }}  # Tag que será usada no compose
 
     steps:
       - name: Checkout code
@@ -51,16 +52,14 @@ jobs:
       - name: Update dev/docker-compose.yml
         run: |
           cd libraflux-config
-          # Usa a tag do job anterior (${{ needs.build-and-push.outputs.image_tag }})
-          echo TESTE TESTE TESTE ${{needs.build-and-push.outputs.image_tag}}
-          sed -i "s|^image:.*|image: ${{ needs.build-and-push.outputs.image_tag }}|" dev/docker-compose.yml
+          # Substitui apenas a tag, mantendo o prefixo do repositório
+          sed -i "s|\(image: renanleal/libraflux:\).*|\1${{ needs.build-and-push.outputs.image_tag }}|" dev/docker-compose.yml
 
       - name: Commit and Push Changes
         run: |
           cd libraflux-config
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
-          git pull
           git add dev/docker-compose.yml
           git commit -m "Update Docker image to ${{ needs.build-and-push.outputs.image_tag }}"
           git push origin main
