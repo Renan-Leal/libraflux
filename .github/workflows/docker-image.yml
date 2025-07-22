@@ -60,6 +60,7 @@ jobs:
           cd libraflux-config
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
+          git pull
           git add dev/docker-compose.yml
           git commit -m "Update Docker image to ${{ needs.build-and-push.outputs.image_tag }}"
           git push origin main
