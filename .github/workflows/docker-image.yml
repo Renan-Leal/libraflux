@@ -34,9 +34,6 @@ jobs:
           push: true
           tags: ${{ env.TAG }}
       
-      - name: DEBUGZADA
-        run: |
-          echo ${TAG}
       - name: Checkout libraflux-config
         uses: actions/checkout@v4
         with:
