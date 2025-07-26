@@ -13,6 +13,8 @@ from .infra.db import Base, engine
 from .domain.auth.auth_module import AuthModule
 from .infra.logs.logging_service import LoggingService
 from .utils.create_default_admin import DefaultAdminManager
+from fastapi import FastAPI
+from fastapi.openapi.utils import get_openapi
 
 load_dotenv()
 
@@ -39,31 +41,51 @@ api_description = os.environ.get("API_DESCRIPTION", "Libraflux Scraping data flo
 api_prefix = os.environ.get("API_VERSION_PREFIX", "")
 logger = LoggingService("libraflux")
 
-# Cria a aplicação PyNest
+# cria PyNest normalmente
 app = PyNestFactory.create(
     AppModule,
     description=api_description,
     title=api_title,
     version=api_version,
     debug=debug,
+    docs_url=None,  # desativa docs internas
+    redoc_url=None,
+    openapi_url=None,
 )
 
-# Cria as tabelas se ainda não existirem
 Base.metadata.create_all(bind=engine)
 
-# Configura o prefixo global se estiver definido
+# Cria um novo app wrapper para aplicar o prefixo e expor docs
 if api_prefix:
     api_prefix = api_prefix.strip("/")
-    global_router = APIRouter(prefix=f"/{api_prefix}" if api_prefix else "")
-    global_router.include_router(app.get_server().router)
-    app.get_server().router.routes = []  # Limpa as rotas existentes
-    app.get_server().include_router(global_router)
+    wrapper_app = FastAPI(
+        title=api_title,
+        description=api_description,
+        version=api_version,
+        debug=debug,
+        docs_url=f"/{api_prefix}/docs",
+        redoc_url=None,
+        openapi_url=f"/{api_prefix}/openapi.json",
+    )
 
-# Adiciona novamente as rotas padrão do FastAPI para documentação
-app.get_server().include_router(APIRouter(), include_in_schema=False)
+    # monta o app PyNest no wrapper
+    wrapper_app.mount(f"/{api_prefix}", app.get_server())
 
-# Instancia o gerenciador de admin e chama o método para criar o admin user
+    # injeta manualmente o schema da app montada no wrapper
+    openapi_schema = get_openapi(
+        title=api_title,
+        version=api_version,
+        description=api_description,
+        routes=app.get_server().routes,
+    )
+    wrapper_app.openapi_schema = openapi_schema
+else:
+    wrapper_app = app.get_server()
+
+
+
+# admin manager etc (deixa como está)
 admin_manager = DefaultAdminManager()
 admin_manager.create_admin_user()
 
-http_server = app.get_server()
+http_server = wrapper_app
