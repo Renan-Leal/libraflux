@@ -194,8 +194,7 @@ class BookScraper:
         current_url = category_url
         page_num = 1
 
-        count = 0
-        while current_url and count < 1:
+        while current_url:
             self.logger.info(f"Processando página {page_num} - {current_url}")
 
             books = self.__get_books_from_page(current_url)
@@ -215,7 +214,6 @@ class BookScraper:
             else:
                 break
 
-            count += 1
             time.sleep(0.5)
 
         return all_books
