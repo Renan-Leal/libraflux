@@ -3,7 +3,6 @@ from nest.core import Injectable
 from ...infra.repositories.book.book_repository import BookRepository
 
 
-
 @Injectable
 class StatsService:
     def __init__(self, repository: BookRepository):

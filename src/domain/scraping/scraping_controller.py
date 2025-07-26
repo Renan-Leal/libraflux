@@ -14,7 +14,9 @@ class ScrapingController:
         self.logger = logger
 
     @Post("/trigger")
-    def trigger(self, background_tasks: BackgroundTasks, user=Depends(require_role("ROOT"))):
+    def trigger(
+        self, background_tasks: BackgroundTasks, user=Depends(require_role("ROOT"))
+    ):
         """
         Endpoint para iniciar o processo de scraping.
         Apenas usuários com a role ROOT podem acessar este endpoint.

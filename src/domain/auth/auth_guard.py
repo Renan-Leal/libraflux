@@ -34,6 +34,7 @@ def require_role(required_role: str):
     """
     Verifica se o usuário atual possui a role necessária.
     """
+
     def role_checker(user=Depends(get_current_user)):
         if user.get("role") != required_role:
             raise HTTPException(

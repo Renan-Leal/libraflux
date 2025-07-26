@@ -5,6 +5,7 @@ from src.infra.repositories.user.user_repository import UserRepository
 from src.infra.db import SessionLocal
 from src.infra.logs.logging_service import LoggingService
 
+
 class DefaultAdminManager:
     def __init__(self):
         self.auth_service = AuthService(UserRepository())
@@ -30,6 +31,8 @@ class DefaultAdminManager:
                 if status_code == 201:
                     self.logger.info("Admin user created successfully.")
                 else:
-                    self.logger.error(f"Failed to create admin user: {signup_response['message']}")
+                    self.logger.error(
+                        f"Failed to create admin user: {signup_response['message']}"
+                    )
             else:
                 self.logger.info("Admin user already exists.")

@@ -11,8 +11,10 @@ class CategoriesController:
     def __init__(self, categories_service: CategoriesService):
         self.categories_service = categories_service
 
-    @Get("/")    
-    def get_all_categories(self, user=Depends(get_current_user)) -> List[CategoryListResponse]:
+    @Get("/")
+    def get_all_categories(
+        self, user=Depends(get_current_user)
+    ) -> List[CategoryListResponse]:
         """
         Retorna todas as categorias disponíveis.
         """

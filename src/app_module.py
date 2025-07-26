@@ -12,9 +12,10 @@ from .infra.models import *
 from .infra.db import Base, engine
 from .domain.auth.auth_module import AuthModule
 from .infra.logs.logging_service import LoggingService
-from utils.create_default_admin import DefaultAdminManager
+from .utils.create_default_admin import DefaultAdminManager
 
 load_dotenv()
+
 
 @Module(
     imports=[
