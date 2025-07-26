@@ -9,12 +9,10 @@ from .domain.health.health_module import HealthModule
 from .domain.stats.stats_module import StatsModule
 from .infra.logs.logging_module import LoggingModule
 from .infra.models import *
-from .infra.db import Base, engine, SessionLocal
-from .infra.repositories.user.user_repository import UserRepository
+from .infra.db import Base, engine
 from .domain.auth.auth_module import AuthModule
-from src.domain.auth.auth_service import AuthService
-from src.domain.auth.dtos.auth_signup import AuthSignup
 from .infra.logs.logging_service import LoggingService
+from .utils.create_default_admin import DefaultAdminManager
 
 load_dotenv()
 
@@ -53,48 +51,19 @@ app = PyNestFactory.create(
 # Cria as tabelas se ainda não existirem
 Base.metadata.create_all(bind=engine)
 
-
-# Cria o usuário admin se não existir
-def create_admin_user():
-    """
-    Cria o usuário admin se não existir.
-    Esta função verifica se o usuário admin já existe e, se não existir, cria um novo usuário admin.
-    """
-    with SessionLocal() as session:
-        auth_service = AuthService(UserRepository())
-
-        # Verifica se o usuário admin já existe
-        admin_user = UserRepository().find_by_email("admin@admin.com")
-        if not admin_user:
-            # Cria o usuário admin chamando o método signup
-            signup_data = AuthSignup(
-                email=os.environ.get("ADMIN_EMAIL"),
-                name=os.environ.get("ADMIN_NAME"),
-                password=os.environ.get("ADMIN_PASSWORD"),
-                role=os.environ.get("ADMIN_ROLE"),
-            )
-            signup_response, status_code = auth_service.signup(signup_data)
-
-            if status_code == 201:
-                print("Admin user created successfully.")
-                # logger.info("Admin user created successfully.")
-            else:
-                print(f"Failed to create admin user: {signup_response['message']}")
-                # logger.error(f"Failed to create admin user: {signup_response['message']}")
-        else:
-            print("Admin user already exists.")
-            # logger.warning("Admin user already exists.")
-
-
 # Configura o prefixo global se estiver definido
 if api_prefix:
     api_prefix = api_prefix.strip("/")
     global_router = APIRouter(prefix=f"/{api_prefix}" if api_prefix else "")
     global_router.include_router(app.get_server().router)
-    app.get_server().router.routes = []
+    app.get_server().router.routes = []  # Limpa as rotas existentes
     app.get_server().include_router(global_router)
 
-# Chama a função para criar o admin user
-create_admin_user()
+# Adiciona novamente as rotas padrão do FastAPI para documentação
+app.get_server().include_router(APIRouter(), include_in_schema=False)
+
+# Instancia o gerenciador de admin e chama o método para criar o admin user
+admin_manager = DefaultAdminManager()
+admin_manager.create_admin_user()
 
 http_server = app.get_server()

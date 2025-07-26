@@ -28,3 +28,19 @@ def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(securit
         raise HTTPException(status_code=401, detail="Token expired")
     except jwt.InvalidTokenError as e:
         raise HTTPException(status_code=401, detail=f"Invalid token: {str(e)}")
+
+
+def require_role(required_role: str):
+    """
+    Verifica se o usuário atual possui a role necessária.
+    """
+
+    def role_checker(user=Depends(get_current_user)):
+        if user.get("role") != required_role:
+            raise HTTPException(
+                status_code=403,
+                detail=f"Acesso negado. Apenas usuários com a role {required_role} podem executar esta ação.",
+            )
+        return user
+
+    return role_checker
