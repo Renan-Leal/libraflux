@@ -15,6 +15,7 @@ from .domain.auth.auth_module import AuthModule
 from src.domain.auth.auth_service import AuthService
 from src.domain.auth.dtos.auth_signup import AuthSignup
 from .infra.logs.logging_service import LoggingService
+from .infra.middleware.logging_middleware import LoggingMiddleware
 
 load_dotenv()
 
@@ -39,6 +40,8 @@ debug = os.environ.get("DEBUG", "False").lower() == "true"
 api_title = os.environ.get("API_TITLE", "Libraflux API")
 api_description = os.environ.get("API_DESCRIPTION", "Libraflux Scraping data flow")
 api_prefix = os.environ.get("API_VERSION_PREFIX", "")
+
+# Criar logger principal da aplicação
 logger = LoggingService("libraflux")
 
 # Cria a aplicação PyNest
@@ -50,8 +53,34 @@ app = PyNestFactory.create(
     debug=debug,
 )
 
+# Adicionar middleware de logging
+app.get_server().add_middleware(LoggingMiddleware, logger=logger)
+
+# Log do início da aplicação
+logger.info(
+    f"Starting {api_title} v{api_version}",
+    operation="application_startup",
+    app_config={
+        "version": api_version,
+        "debug": debug,
+        "api_prefix": api_prefix,
+        "environment": os.environ.get("ENVIRONMENT", "development")
+    }
+)
+
 # Cria as tabelas se ainda não existirem
-Base.metadata.create_all(bind=engine)
+try:
+    Base.metadata.create_all(bind=engine)
+    logger.info("Database tables created successfully", operation="database_init")
+except Exception as e:
+    logger.error(
+        f"Failed to create database tables: {str(e)}",
+        operation="database_init_error",
+        error_data={
+            "error_message": str(e),
+            "error_type": type(e).__name__
+        }
+    )
 
 # Cria o usuário admin se não existir
 def create_admin_user():
@@ -59,30 +88,68 @@ def create_admin_user():
     Cria o usuário admin se não existir.
     Esta função verifica se o usuário admin já existe e, se não existir, cria um novo usuário admin.
     """
-    with SessionLocal() as session:
-        auth_service = AuthService(UserRepository())
+    try:
+        with SessionLocal() as session:
+            auth_service = AuthService(UserRepository(), logger)
 
-        # Verifica se o usuário admin já existe
-        admin_user = UserRepository().find_by_email("admin@admin.com")
-        if not admin_user:
-            # Cria o usuário admin chamando o método signup
-            signup_data = AuthSignup(
-                email = os.environ.get("ADMIN_EMAIL"),
-                name = os.environ.get("ADMIN_NAME"),
-                password = os.environ.get("ADMIN_PASSWORD"),
-                role = os.environ.get("ADMIN_ROLE")
-            )
-            signup_response, status_code = auth_service.signup(signup_data)
+            # Verifica se o usuário admin já existe
+            admin_email = os.environ.get("ADMIN_EMAIL")
+            if not admin_email:
+                logger.warning(
+                    "Admin email not configured in environment variables",
+                    operation="admin_user_setup",
+                    reason="missing_admin_email_config"
+                )
+                return
 
-            if status_code == 201:
-                print("Admin user created successfully.")
-                # logger.info("Admin user created successfully.")
+            admin_user = UserRepository().find_by_email(admin_email)
+            if not admin_user:
+                # Cria o usuário admin chamando o método signup
+                signup_data = AuthSignup(
+                    email=admin_email,
+                    name=os.environ.get("ADMIN_NAME", "Administrator"),
+                    password=os.environ.get("ADMIN_PASSWORD"),
+                    role=os.environ.get("ADMIN_ROLE", "admin")
+                )
+                
+                signup_response, status_code = auth_service.signup(signup_data)
+
+                if status_code == 201:
+                    logger.info(
+                        "Admin user created successfully",
+                        operation="admin_user_created",
+                        admin_data={
+                            "email": logger._mask_email(admin_email),
+                            "name": signup_data.name,
+                            "role": signup_data.role
+                        }
+                    )
+                else:
+                    logger.error(
+                        f"Failed to create admin user: {signup_response.get('message', 'Unknown error')}",
+                        operation="admin_user_creation_failed",
+                        error_data={
+                            "status_code": status_code,
+                            "response": signup_response
+                        }
+                    )
             else:
-                print(f"Failed to create admin user: {signup_response['message']}")
-                # logger.error(f"Failed to create admin user: {signup_response['message']}")
-        else:
-            print("Admin user already exists.")
-            # logger.warning("Admin user already exists.")
+                logger.info(
+                    "Admin user already exists, skipping creation",
+                    operation="admin_user_exists",
+                    admin_data={
+                        "email": logger._mask_email(admin_email)
+                    }
+                )
+    except Exception as e:
+        logger.error(
+            f"Error during admin user setup: {str(e)}",
+            operation="admin_user_setup_error",
+            error_data={
+                "error_message": str(e),
+                "error_type": type(e).__name__
+            }
+        )
 
 # Configura o prefixo global se estiver definido
 if api_prefix:
@@ -91,8 +158,21 @@ if api_prefix:
     global_router.include_router(app.get_server().router)
     app.get_server().router.routes = []
     app.get_server().include_router(global_router)
+    
+    logger.info(
+        f"API prefix configured: /{api_prefix}",
+        operation="api_prefix_setup",
+        config_data={
+            "prefix": api_prefix
+        }
+    )
 
 # Chama a função para criar o admin user
 create_admin_user()
+
+logger.info(
+    "Application startup completed successfully",
+    operation="application_ready"
+)
 
 http_server = app.get_server()
