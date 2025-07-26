@@ -63,9 +63,9 @@ if api_prefix:
         description=api_description,
         version=api_version,
         debug=debug,
-        docs_url=f"/{api_prefix}/docs",
+        docs_url=f"/docs",
         redoc_url=None,
-        openapi_url=f"/{api_prefix}/openapi.json",
+        openapi_url=f"/openapi.json",
     )
 
     # monta o app PyNest no wrapper
@@ -78,6 +78,7 @@ if api_prefix:
         description=api_description,
         routes=app.get_server().routes,
     )
+    openapi_schema["servers"] = [{"url": f"/{api_prefix}", "description": "API Server"}]
     wrapper_app.openapi_schema = openapi_schema
 else:
     wrapper_app = app.get_server()
