@@ -4,7 +4,6 @@ from .stats_controller import StatsController
 from ...infra.repositories.book.book_repository_module import BookRepositoryModule
 
 
-
 @Module(
     imports=[BookRepositoryModule],
     providers=[StatsService],

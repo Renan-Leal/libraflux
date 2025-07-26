@@ -12,7 +12,9 @@ class BookController:
         self.service = service
 
     @Get("/")
-    def list_books(self, page: int = None, size: int = None, user=Depends(get_current_user)):
+    def list_books(
+        self, page: int = None, size: int = None, user=Depends(get_current_user)
+    ):
         """
         /books/?page=1&size=10
         Lista os livros com paginação opcional.
@@ -30,7 +32,12 @@ class BookController:
         return self.service.get_top_rated_books()
 
     @Get("/price-range")
-    def list_books_by_price_range(self, min_price: float = None, max_price: float = None, user=Depends(get_current_user)):
+    def list_books_by_price_range(
+        self,
+        min_price: float = None,
+        max_price: float = None,
+        user=Depends(get_current_user),
+    ):
         """
         Lista livros dentro de um intervalo de preços.
         Exemplo: /books/price-range?min_price=10.0&max_price=50.0
@@ -40,13 +47,15 @@ class BookController:
         return {"error": "Parâmetros 'min_price' e 'max_price' são necessários."}
 
     @Get("/search")
-    def search_books(self, title: str = None, category: str = None, user=Depends(get_current_user)):
+    def search_books(
+        self, title: str = None, category: str = None, user=Depends(get_current_user)
+    ):
         """
         Busca livros por título e/ou categoria.
         Exemplo: /books/search?title=Python&category=Programming
         """
         return self.service.search_books(title, category)
-    
+
     @Get("/{id}")
     def get_book(self, id: int, user=Depends(get_current_user)):
         """
@@ -54,4 +63,3 @@ class BookController:
         Exemplo: /books/1
         """
         return self.service.get_book_by_id(id)
-    

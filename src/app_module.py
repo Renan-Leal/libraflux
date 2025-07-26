@@ -53,6 +53,7 @@ app = PyNestFactory.create(
 # Cria as tabelas se ainda não existirem
 Base.metadata.create_all(bind=engine)
 
+
 # Cria o usuário admin se não existir
 def create_admin_user():
     """
@@ -67,10 +68,10 @@ def create_admin_user():
         if not admin_user:
             # Cria o usuário admin chamando o método signup
             signup_data = AuthSignup(
-                email = os.environ.get("ADMIN_EMAIL"),
-                name = os.environ.get("ADMIN_NAME"),
-                password = os.environ.get("ADMIN_PASSWORD"),
-                role = os.environ.get("ADMIN_ROLE")
+                email=os.environ.get("ADMIN_EMAIL"),
+                name=os.environ.get("ADMIN_NAME"),
+                password=os.environ.get("ADMIN_PASSWORD"),
+                role=os.environ.get("ADMIN_ROLE"),
             )
             signup_response, status_code = auth_service.signup(signup_data)
 
@@ -83,6 +84,7 @@ def create_admin_user():
         else:
             print("Admin user already exists.")
             # logger.warning("Admin user already exists.")
+
 
 # Configura o prefixo global se estiver definido
 if api_prefix:

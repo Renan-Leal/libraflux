@@ -19,7 +19,7 @@ class AuthService:
     def signup(self, authSignup: AuthSignup):
         """
         Cria um novo usuário com base nos dados fornecidos.
-        
+
         :param authSignup: Dados do usuário a ser criado.
         :return: Um dicionário com os detalhes do usuário criado ou uma mensagem de erro.
         """
@@ -54,7 +54,7 @@ class AuthService:
     def login(self, authLogin: AuthLogin):
         """
         Realiza o login do usuário com base no email e senha fornecidos.
-        
+
         :param authLogin: Dados de login do usuário.
         :return: Um dicionário com o token de acesso ou uma mensagem de erro.
         """
