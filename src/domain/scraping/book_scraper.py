@@ -6,6 +6,7 @@ from typing import List, Dict, Tuple
 from urllib.parse import urljoin
 from ...infra.logs.logging_service import LoggingService
 import os
+import re
 
 
 @Injectable
@@ -35,6 +36,7 @@ class BookScraper:
         categories = {}
         sidebar = soup.find("div", class_="side_categories")
         self.logger.debug(f"A side bar é {sidebar}")
+
         if sidebar:
             links = sidebar.find_all("a", href=True)
             self.logger.debug(f"Tem {len(links)}, exemplo : {links[5]}")
@@ -47,39 +49,128 @@ class BookScraper:
         self.logger.info(f"Encontradas {len(categories)} categorias")
         return categories
 
-    def __extract_book_info(self, book_element) -> Dict:
-        """Extrai informações de um livro"""
+    def __extract_book_details(self, book_url) -> Dict:
+        """Extrai informações detalhadas do livro"""
         book_data = {}
 
-        # Título
-        title_element = book_element.find("h3").find("a")
-        book_data["title"] = title_element.get("title", "") if title_element else ""
+        book_url_aux = f"{self.base_url}/catalogue/{book_url.split('../')[-1]}"
+        soup_page_book = self.__get_page(book_url_aux)
+
+        # Título do livro
+        book_data["title"] = (
+            soup_page_book.find("h1").get_text(strip=True)
+            if soup_page_book.find("h1")
+            else ""
+        )
+
+        # Categoria
+        category_element = soup_page_book.find("ul", class_="breadcrumb")
+        if category_element:
+            category_links = category_element.find_all("a")
+            if len(category_links) >= 3:
+                book_data["category"] = category_links[2].get_text(strip=True)
+            else:
+                book_data["category"] = ""
 
         # Preço
-        price_element = book_element.find("p", class_="price_color")
-        book_data["price"] = price_element.text.strip() if price_element else ""
+        book_data["price"] = (
+            soup_page_book.find("p", class_="price_color")
+            .get_text(strip=True)
+            .replace("Â", "")
+            if soup_page_book.find("p", class_="price_color")
+            else ""
+        )
 
-        # Disponibilidade
-        stock_element = book_element.find("p", class_="instock availability")
-        book_data["availability"] = stock_element.text.strip() if stock_element else ""
-
-        # Rating (estrelas)
-        rating_element = book_element.find("p", class_="star-rating")
-        if rating_element:
-            rating_classes = rating_element.get("class", [])
-            rating_words = ["Zero", "One", "Two", "Three", "Four", "Five"]
-            for word in rating_words:
-                if word in rating_classes:
-                    book_data["rating"] = rating_words.index(word)
-                    break
+        # Stock
+        availability_element = soup_page_book.find("p", class_="instock availability")
+        if availability_element:
+            availability_text = availability_element.get_text(
+                strip=True
+            )  # Ex.: "In stock (22 available)"
+            book_data["availability"] = (
+                "In stock" if "In stock" in availability_text else "Out of stock"
+            )
+            # Extrair a quantidade (número entre parênteses)
+            quantity_match = re.search(r"\((\d+) available\)", availability_text)
+            book_data["quantity"] = (
+                int(quantity_match.group(1)) if quantity_match else 0
+            )
         else:
-            book_data["rating"] = 0
+            book_data["availability"] = ""
+            book_data["quantity"] = 0
 
-        # Link do livro
-        if title_element:
-            book_data["link"] = urljoin(self.base_url, title_element.get("href", ""))
+        # Rating
+        rating_element = soup_page_book.find("p", class_="star-rating")
+        rating_words = {"One": 1, "Two": 2, "Three": 3, "Four": 4, "Five": 5}
+        book_data["rating"] = (
+            next(
+                (
+                    rating_words[word]
+                    for word in rating_words
+                    if word in rating_element.get("class", [])
+                ),
+                0,
+            )
+            if rating_element
+            else 0
+        )
+        # Description - extrai e corrige encoding
+        desc_element = soup_page_book.find("div", id="product_description")
+        if desc_element and desc_element.find_next("p"):
+            raw_desc = (
+                desc_element.find_next("p").get_text(strip=True).replace(";", ".")
+            )
+            corrected_desc = raw_desc.encode("latin1", errors="ignore").decode(
+                "utf-8", errors="ignore"
+            )
+            book_data["description"] = corrected_desc
+        else:
+            book_data["description"] = ""
+
+        # Product Information
+        table = soup_page_book.find("table", class_="table table-striped")
+        if table:
+            for row in table.find_all("tr"):
+                key = row.find("th").get_text(strip=True)
+                value = row.find("td").get_text(strip=True)
+                book_data[key] = value
+
+        # Image
+        img_element = soup_page_book.find("img")
+        img_src = (
+            img_element["src"].replace("../", "")
+            if img_element and "src" in img_element.attrs
+            else ""
+        )
+        book_data["image"] = f"{self.base_url}{img_src}"
 
         return book_data
+
+    def __extract_book_info(self, book_element) -> Dict:
+        """Chama o método para extrair a informação do livro, passando a url dele"""
+        book_url = book_element.find("h3").find("a").get("href")
+        book_details = self.__extract_book_details(book_url)
+
+        # Resultado filtrado com limpeza de "Â"
+        books_filtered = {
+            "id": book_details.get("UPC"),
+            "title": book_details.get("title"),
+            "category": book_details.get("category", ""),
+            "rating": book_details.get("rating", 0),
+            "price_excl_tax": book_details.get("Price (excl. tax)", "").replace(
+                "Â£", ""
+            ),
+            "price_incl_tax": book_details.get("Price (incl. tax)", "").replace(
+                "Â£", ""
+            ),
+            "tax": book_details.get("Tax", "").replace("Â£", ""),
+            "availability": book_details.get("quantity", 0),
+            "reviews_qtd": book_details.get("Number of reviews"),
+            "description": book_details.get("description"),
+            "image": book_details.get("image"),
+        }
+
+        return books_filtered
 
     def __get_books_from_page(self, page_url: str) -> List[Dict]:
         """Extrai todos os livros de uma página"""
@@ -103,7 +194,8 @@ class BookScraper:
         current_url = category_url
         page_num = 1
 
-        while current_url:
+        count = 0
+        while current_url and count < 1:
             self.logger.info(f"Processando página {page_num} - {current_url}")
 
             books = self.__get_books_from_page(current_url)
@@ -123,6 +215,7 @@ class BookScraper:
             else:
                 break
 
+            count += 1
             time.sleep(0.5)
 
         return all_books
@@ -133,20 +226,13 @@ class BookScraper:
 
         books = self.__get_all_pages_from_category(category_url)
 
-        for book in books:
-            book["category"] = category_name
-
-        self.logger.info(f"Categoria {category_name}: {len(books)} livros encontrados")
+        self.logger.info(f"Quantidade de livros encontrados - {len(books)}")
         return books
 
     def execute(self):
         """Função principal para executar o scraping"""
 
         categories = self.__get_categories()
-
-        print("Categorias disponíveis:")
-        for i, (name, url) in enumerate(categories.items(), 1):
-            print(f"{i}. {name}")
 
         if categories:
             first_category = list(categories.items())[0]

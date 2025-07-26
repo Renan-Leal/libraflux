@@ -2,8 +2,13 @@ from nest.core import Module
 from .scraping_service import ScrapingService
 from .scraping_controller import ScrapingController
 from .book_scraper import BookScraper
+from ...infra.repositories.book.book_repository_module import BookRepositoryModule
 
 
-@Module(providers=[BookScraper, ScrapingService], controllers=[ScrapingController])
+@Module(
+    imports=[BookRepositoryModule],
+    providers=[BookScraper, ScrapingService],
+    controllers=[ScrapingController],
+)
 class ScrapingModule:
     pass
