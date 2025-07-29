@@ -24,3 +24,4 @@ class StatsController:
         Retorna as estatísticas por categoria .
         """
         return self.service.get_categories_stats()
+      
