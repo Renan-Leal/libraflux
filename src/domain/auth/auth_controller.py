@@ -12,8 +12,16 @@ class AuthController:
 
     @Post("/signup")
     def check(self, authSignup: AuthSignup):
+        """
+        Endpoint para registrar um novo usuário.
+        Este endpoint permite que novos usuários se registrem no sistema.
+        """
         return self.service.signup(authSignup)
 
     @Post("/login")
     def login(self, authLogin: AuthLogin):
+        """
+        Endpoint para autenticar um usuário.
+        Este endpoint permite que usuários façam login no sistema.
+        """
         return self.service.login(authLogin)

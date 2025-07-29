@@ -17,6 +17,12 @@ class AuthService:
         self.algorithm = os.environ.get("JWT_ALGORITHM", "")
 
     def signup(self, authSignup: AuthSignup):
+        """
+        Cria um novo usuário com base nos dados fornecidos.
+
+        :param authSignup: Dados do usuário a ser criado.
+        :return: Um dicionário com os detalhes do usuário criado ou uma mensagem de erro.
+        """
         password_hash = hashlib.sha256(
             (authSignup.password + self.secret).encode()
         ).hexdigest()
@@ -46,6 +52,12 @@ class AuthService:
             return {"message": f"Failed to create user: {str(e)}"}, 400
 
     def login(self, authLogin: AuthLogin):
+        """
+        Realiza o login do usuário com base no email e senha fornecidos.
+
+        :param authLogin: Dados de login do usuário.
+        :return: Um dicionário com o token de acesso ou uma mensagem de erro.
+        """
         user = self.userRepository.find_by_email(authLogin.email)
 
         if not user:
