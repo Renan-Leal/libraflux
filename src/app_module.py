@@ -7,6 +7,7 @@ from .domain.scraping.scraping_module import ScrapingModule
 from .domain.categories.categories_module import CategoriesModule
 from .domain.health.health_module import HealthModule
 from .domain.stats.stats_module import StatsModule
+from .domain.ml.ml_module import MlModule
 from .infra.logs.logging_module import LoggingModule
 from .infra.models import *
 from .infra.db import Base, engine
@@ -28,6 +29,7 @@ load_dotenv()
         CategoriesModule,
         StatsModule,
         AuthModule,
+        MlModule,
     ]
 )
 class AppModule:
