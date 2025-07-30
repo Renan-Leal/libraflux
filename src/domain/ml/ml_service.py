@@ -1,5 +1,5 @@
 from nest.core import Injectable
-from ...infra.repositories.book_repository import BookRepository
+from ...infra.repositories.book.book_repository import BookRepository
 from ...infra.logs.logging_service import LoggingService
 from .dto.ml_dto import (
     BookFeatureResponse,
