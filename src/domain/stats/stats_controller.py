@@ -1,5 +1,7 @@
 from nest.core import Controller, Get
 from .stats_service import StatsService
+from .dto.stats_dto import OverviewStatsResponse, CategoryStats
+from typing import Dict
 from ..auth.auth_guard import get_current_user
 from fastapi import Depends
 
@@ -22,3 +24,4 @@ class StatsController:
         Retorna as estatísticas por categoria .
         """
         return self.service.get_categories_stats()
+      
