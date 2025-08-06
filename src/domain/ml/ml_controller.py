@@ -7,6 +7,8 @@ from .dto.ml_dto import (
     PredictionResponse,
 )
 from typing import List
+from ..auth.auth_guard import get_current_user
+from fastapi import Depends
 
 
 @Controller("/ml")
@@ -15,7 +17,7 @@ class MlController:
         self.service = service
 
     @Get("/features", description="Dados formatados para features.")
-    def get_features(self) -> List[BookFeatureResponse]:
+    def get_features(self, user=Depends(get_current_user)) -> List[BookFeatureResponse]:
         """Dados formatados para features.
 
         Returns:
@@ -29,7 +31,7 @@ class MlController:
         return self.service.get_features()
 
     @Get("/training-data", description="Dataset para treinamento.")
-    def get_training_data(self) -> List[TrainingDataResponse]:
+    def get_training_data(self, user=Depends(get_current_user)) -> List[TrainingDataResponse]:
         """Dataset para treinamento.
 
         Returns:
@@ -44,7 +46,7 @@ class MlController:
         return self.service.get_training_data()
 
     @Post("/predictions", description="Endpoint para receber predições.")
-    def post_predictions(self, prediction: PredictionRequest) -> PredictionResponse:
+    def post_predictions(self, prediction: PredictionRequest, user=Depends(get_current_user)) -> PredictionResponse:
         """Endpoint para receber predições.
 
         Args:

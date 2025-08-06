@@ -19,6 +19,7 @@ The application is designed with the following objectives:
 This project combines backend development, data extraction, and security best practices, making it a robust example of how to integrate data collection with secure data exposure in real-world applications.
 
 ## Architecture
+
 ![libraflux](arquitetura.png)
 
 ## Flow Description
@@ -38,9 +39,10 @@ This project combines backend development, data extraction, and security best pr
 pip install -r requirements.txt
 ```
 
-- Create a `.env` file in the project root.  
+- Create a `.env` file in the project root.
 - Copy all variables from `.env.example` and change the values as needed for your environment.
 - Initialize the environment
+
 ```bash
 venv\Scripts\activate
 ```
@@ -74,6 +76,7 @@ To ensure code quality and consistency, run the following script from the projec
 ```
 
 This script will:
+
 - Format your code using **Black**
 - Run **pylint** to check for code issues
 
@@ -101,15 +104,16 @@ Use the following commit message prefixes to standardize your commits:
 ## API Reference
 
 ### Authentication
-|Method |Endpoint              |  Description           |
-|-------|----------------------|------------------------|
-|POST	  |`/api/v1/auth/signup` |Create a new user       |
-|POST   |`/api/v1/auth/login`  |Login and get JWT token |
+
+| Method | Endpoint              | Description             |
+| ------ | --------------------- | ----------------------- |
+| POST   | `/api/v1/auth/signup` | Create a new user       |
+| POST   | `/api/v1/auth/login`  | Login and get JWT token |
 
 ### Book Endpoints
 
 | Method | Endpoint                    | Description                     |
-|--------|---------------------------- |-------------------------------- |
+| ------ | --------------------------- | ------------------------------- |
 | GET    | `/api/v1/books`             | List all books                  |
 | GET    | `/api/v1/books/{id}`        | Get book by ID                  |
 | GET    | `/api/v1/books/top-rated`   | List top-rated books            |
@@ -119,26 +123,30 @@ Use the following commit message prefixes to standardize your commits:
 ### Categories & Statistics Endpoints
 
 | Method | Endpoint                   | Description                     |
-|--------|--------------------------- |-------------------------------- |
+| ------ | -------------------------- | ------------------------------- |
 | GET    | `/api/v1/categories`       | List all book categories        |
 | GET    | `/api/v1/stats/overview`   | Get general statistics overview |
 | GET    | `/api/v1/stats/categories` | Get book count per category     |
 
----
-
 ### Scraping Endpoint
 
 | Method | Endpoint                   | Description                    |
-|--------|----------------------------|--------------------------------|
+| ------ | -------------------------- | ------------------------------ |
 | POST   | `/api/v1/scraping/trigger` | Trigger a new scraping process |
-
----
 
 ### Health Check Endpoint
 
 | Method | Endpoint               | Description      |
-|--------|------------------------|------------------|
+| ------ | ---------------------- | ---------------- |
 | GET    | `/api/v1/health/check` | Check API status |
+
+### Machine Learning Endpoints
+
+| Method | Endpoint                   | Description                 |
+| ------ | -------------------------- | --------------------------- |
+| GET    | `/api/v1/ml/features`      | Formatted data for features |
+| GET    | `/api/v1/ml/training-data` | Training dataset            |
+| GET    | `/api/v1/ml/predictions`   | Prediction endpoint         |
 
 ## Exemplos de Requisições e Respostas
 
